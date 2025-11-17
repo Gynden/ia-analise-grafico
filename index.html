@@ -89,95 +89,121 @@
   </div>
 
   <script>
-    const fileInput = document.getElementById("file-input");
-    const previewImage = document.getElementById("preview-image");
-    const previewPlaceholder = document.getElementById("preview-placeholder");
-    const analisarBtn = document.getElementById("analisar-btn");
-    const statusText = document.getElementById("status-text");
+  const fileInput = document.getElementById("file-input");
+  const previewImage = document.getElementById("preview-image");
+  const previewPlaceholder = document.getElementById("preview-placeholder");
+  const analisarBtn = document.getElementById("analisar-btn");
+  const statusText = document.getElementById("status-text");
 
-    const resultadoCard = document.getElementById("resultado-card");
-    const acaoText = document.getElementById("acao-text");
-    const confText = document.getElementById("conf-text");
-    const justificativaText = document.getElementById("justificativa-text");
+  const resultadoCard = document.getElementById("resultado-card");
+  const acaoText = document.getElementById("acao-text");
+  const confText = document.getElementById("conf-text");
+  const justificativaText = document.getElementById("justificativa-text");
 
-    let selectedFile = null;
+  let selectedFile = null;
 
-    // abrir seletor
-    document.querySelector("label").addEventListener("click", () => {
-      fileInput.click();
-    });
+  // função única pra setar a imagem (input OU cola)
+  function setImageFile(file) {
+    if (!file) return;
 
-    // preview imagem
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      previewImage.src = ev.target.result;
+      previewImage.classList.remove("hidden");
+      previewPlaceholder.classList.add("hidden");
+    };
+    reader.readAsDataURL(file);
+    statusText.textContent = "Imagem carregada. Pronto para analisar.";
+  }
 
-      selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        previewImage.src = ev.target.result;
-        previewImage.classList.remove("hidden");
-        previewPlaceholder.classList.add("hidden");
-      };
-      reader.readAsDataURL(file);
-      statusText.textContent = "Imagem carregada. Pronto para analisar.";
-    });
+  // abrir seletor quando clicar no botão "Trocar imagem"
+  document.querySelector("label").addEventListener("click", () => {
+    fileInput.click();
+  });
 
-    // analisar
-    analisarBtn.addEventListener("click", async () => {
-      if (!selectedFile) {
-        alert("Selecione primeiro o print do gráfico.");
-        return;
+  // quando escolher pelo gerenciador de arquivos
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+  });
+
+  // 💥 NOVO: permitir colar print (Ctrl+V)
+  document.addEventListener("paste", (e) => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf("image") !== -1) {
+        const file = item.getAsFile();
+        setImageFile(file);
+        statusText.textContent = "Imagem colada da área de transferência. Pronto para analisar.";
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+
+  // botão Analisar
+  analisarBtn.addEventListener("click", async () => {
+    if (!selectedFile) {
+      alert("Selecione ou cole primeiro o print do gráfico.");
+      return;
+    }
+
+    analisarBtn.disabled = true;
+    statusText.textContent = "Analisando gráfico com IA...";
+    resultadoCard.classList.add("hidden");
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    try {
+      const res = await fetch("https://ia-analise-grafico.onrender.com/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Resposta do backend não OK:", res.status, text);
+        throw new Error("Resposta não OK do backend");
       }
 
-      analisarBtn.disabled = true;
-      statusText.textContent = "Analisando gráfico com IA...";
-      resultadoCard.classList.add("hidden");
+      const data = await res.json();
 
-      const formData = new FormData();
-      formData.append("image", selectedFile);
+      const acao = data.acao || "NAO_OPERAR";
+      const conf = data.confianca || 0.5;
+      const justificativa =
+        data.justificativa ||
+        "Mercado indefinido. IA recomenda não operar neste momento.";
 
-      try {
-        const res = await fetch("https://ia-analise-grafico.onrender.com/", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-
-        const acao = data.acao || "NAO_OPERAR";
-        const conf = data.confianca || 0.5;
-        const justificativa =
-          data.justificativa ||
-          "Mercado indefinido. IA recomenda não operar neste momento.";
-
-        if (acao === "COMPRAR") {
-          acaoText.textContent = "COMPRAR";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-emerald-400";
-        } else if (acao === "VENDER") {
-          acaoText.textContent = "VENDER";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-rose-300";
-        } else {
-          acaoText.textContent = "NÃO OPERAR";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-amber-300";
-        }
-
-        confText.textContent = "Confiança: " + (conf * 100).toFixed(0) + "%";
-        justificativaText.textContent = justificativa;
-
-        resultadoCard.classList.remove("hidden");
-        statusText.textContent = "Análise concluída.";
-      } catch (err) {
-        console.error(err);
-        statusText.textContent = "Erro ao analisar. Tente novamente.";
-        alert("Erro ao conectar com o servidor de IA.");
-      } finally {
-        analisarBtn.disabled = false;
+      if (acao === "COMPRAR") {
+        acaoText.textContent = "COMPRAR";
+        acaoText.className =
+          "text-3xl md:text-4xl font-black mb-2 text-emerald-400";
+      } else if (acao === "VENDER") {
+        acaoText.textContent = "VENDER";
+        acaoText.className =
+          "text-3xl md:text-4xl font-black mb-2 text-rose-300";
+      } else {
+        acaoText.textContent = "NÃO OPERAR";
+        acaoText.className =
+          "text-3xl md:text-4xl font-black mb-2 text-amber-300";
       }
-    });
-  </script>
-</body>
-</html>
+
+      confText.textContent = "Confiança: " + (conf * 100).toFixed(0) + "%";
+      justificativaText.textContent = justificativa;
+
+      resultadoCard.classList.remove("hidden");
+      statusText.textContent = "Análise concluída.";
+    } catch (err) {
+      console.error("Erro no fetch:", err);
+      statusText.textContent = "Erro ao analisar. Tente novamente.";
+      alert("Erro ao conectar com o servidor de IA.");
+    } finally {
+      analisarBtn.disabled = false;
+    }
+  });
+</script>
