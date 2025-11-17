@@ -102,7 +102,7 @@
 
   let selectedFile = null;
 
-  // 🔗 URL CERTA DO BACKEND (com /api/analisar)
+  // ROTA EXATA DO SWAGGER: POST /api/analisar
   const BACKEND_URL = "https://ia-analise-grafico.onrender.com/";
 
   function setImageFile(file) {
@@ -128,7 +128,7 @@
     setImageFile(file);
   });
 
-  // cola de print (Ctrl+V)
+  // Permitir colar print diretamente (Ctrl+V)
   document.addEventListener("paste", (e) => {
     const clipboard = e.clipboardData || window.clipboardData;
     if (!clipboard) return;
@@ -168,7 +168,7 @@
     resultadoCard.classList.add("hidden");
 
     const formData = new FormData();
-    formData.append("image", selectedFile);
+    formData.append("image", selectedFile); // nome do campo = 'image'
 
     try {
       const res = await fetch(BACKEND_URL, {
@@ -179,7 +179,10 @@
       if (!res.ok) {
         const txt = await res.text();
         console.error("Erro HTTP do backend:", res.status, txt);
-        throw new Error("HTTP " + res.status);
+        // Mostra o status no alerta pra você ver o código se der algo errado
+        alert("Erro no servidor de IA: HTTP " + res.status);
+        statusText.textContent = "Erro ao analisar. Tente novamente.";
+        return;
       }
 
       const data = await res.json();
