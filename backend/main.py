@@ -18,9 +18,6 @@ async def root():
 async def analisar(image: UploadFile = File(...)):
     conteudo = await image.read()
 
-    # TODO: aqui depois você conecta na IA de visão de verdade.
-    # Por enquanto, vamos devolver algo fixo só para testar o app.
-
     resposta = {
         "acao": "VENDER",        # COMPRAR, VENDER ou NAO_OPERAR
         "confianca": 0.70,       # 0 a 1
