@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# usa a chave da Groq vinda da variável de ambiente
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 
@@ -25,15 +24,10 @@ async def root():
     return {"status": "online"}
 
 
+# Aceita /api/analisar E /api/analisar/
 @app.post("/api/analisar")
+@app.post("/api/analisar/")
 async def analisar_imagem(image: UploadFile | None = File(None)):
-    """
-    Endpoint que recebe um arquivo de imagem (campo 'image')
-    e retorna acao, confianca e justificativa.
-    Mesmo se der erro, SEMPRE retorna status 200 com um JSON.
-    """
-
-    # se não veio imagem, já devolve um aviso amigável
     if image is None:
         return {
             "acao": "NAO_OPERAR",
@@ -106,7 +100,6 @@ async def analisar_imagem(image: UploadFile | None = File(None)):
         }
 
     except Exception as e:
-        # Qualquer erro da Groq cai aqui e mesmo assim devolve 200
         print("Erro Groq:", e)
         return {
             "acao": "NAO_OPERAR",
