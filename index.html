@@ -102,7 +102,7 @@
 
   let selectedFile = null;
 
-  // função única pra setar a imagem (input OU cola)
+  // --- FUNÇÃO ÚNICA PARA DEFINIR A IMAGEM (input ou Ctrl+V) ---
   function setImageFile(file) {
     if (!file) return;
 
@@ -117,35 +117,49 @@
     statusText.textContent = "Imagem carregada. Pronto para analisar.";
   }
 
-  // abrir seletor quando clicar no botão "Trocar imagem"
+  // Abrir seletor ao clicar em "Trocar imagem"
   document.querySelector("label").addEventListener("click", () => {
     fileInput.click();
   });
 
-  // quando escolher pelo gerenciador de arquivos
+  // Quando escolher pelo gerenciador de arquivos
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     setImageFile(file);
   });
 
-  // 💥 NOVO: permitir colar print (Ctrl+V)
+  // --- NOVO: permitir colar print diretamente (Ctrl+V) ---
   document.addEventListener("paste", (e) => {
-    const items = e.clipboardData && e.clipboardData.items;
-    if (!items) return;
+    const clipboard = e.clipboardData || window.clipboardData;
+    if (!clipboard) return;
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type.indexOf("image") !== -1) {
-        const file = item.getAsFile();
-        setImageFile(file);
-        statusText.textContent = "Imagem colada da área de transferência. Pronto para analisar.";
-        e.preventDefault();
-        break;
+    let file = null;
+
+    // tenta pegar pelos items (navegadores modernos)
+    if (clipboard.items && clipboard.items.length) {
+      for (let i = 0; i < clipboard.items.length; i++) {
+        const item = clipboard.items[i];
+        if (item.type.indexOf("image") !== -1) {
+          file = item.getAsFile();
+          break;
+        }
       }
+    }
+
+    // fallback: alguns navegadores colocam em .files
+    if (!file && clipboard.files && clipboard.files.length) {
+      file = clipboard.files[0];
+    }
+
+    if (file) {
+      setImageFile(file);
+      statusText.textContent =
+        "Imagem colada da área de transferência. Pronto para analisar.";
+      e.preventDefault(); // evita colar lixo na página
     }
   });
 
-  // botão Analisar
+  // Botão "Analisar Gráfico"
   analisarBtn.addEventListener("click", async () => {
     if (!selectedFile) {
       alert("Selecione ou cole primeiro o print do gráfico.");
@@ -160,10 +174,13 @@
     formData.append("image", selectedFile);
 
     try {
-      const res = await fetch("https://ia-analise-grafico.onrender.com/", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "hhttps://ia-analise-grafico.onrender.com/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!res.ok) {
         const text = await res.text();
