@@ -1,93 +1,85 @@
+# backend/main.py
 import os
 import base64
 import json
-
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from openai import OpenAI
+from groq import Groq
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# cliente OpenAI usando variável de ambiente
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-@app.get("/")
-async def root():
-    return {"status": "online"}
-
-@app.post("/api/analisar")
-async def analisar(image: UploadFile = File(...)):
-    # lê bytes da imagem enviada pelo front
-    img_bytes = await image.read()
-    base64_image = base64.b64encode(img_bytes).decode("utf-8")
-
-    # instruções pra IA (em pt-BR, focando em COMPRAR / VENDER / NÃO OPERAR)
-    prompt = """
-Você é um analista técnico de gráficos de trading.
-
-O usuário tirou um print de um gráfico de candles (timeframe 5 minutos).
-Seu trabalho é dizer se, nesse exato momento, a melhor decisão é:
-
-- "COMPRAR" (se o contexto favorece alta / continuidade de alta)
-- "VENDER" (se o contexto favorece baixa / continuidade de baixa)
-- "NAO_OPERAR" (se o cenário estiver confuso, lateral, sem sinal claro ou muito arriscado)
-
-Considere:
-- Tendência (alta, baixa ou lateral)
-- Regiões de suporte e resistência
-- Força dos candles recentes (corpos grandes/pequenos, pavios)
-- Possíveis rompimentos ou rejeições importantes
-
-Responda SEMPRE em JSON válido, exatamente nesse formato:
-
-{
-  "acao": "COMPRAR" | "VENDER" | "NAO_OPERAR",
-  "confianca": 0.0 a 1.0,
-  "justificativa": "texto curto em português explicando o motivo"
-}
-
-Regras importantes:
-- Se o gráfico estiver lateral ou muito indeciso, escolha "NAO_OPERAR" com confiança <= 0.6.
-- Evite ser agressivo demais. Prefira "NAO_OPERAR" quando não houver confluência clara.
-"""
-
+@app.post("/")
+async def analisar_imagem(image: UploadFile = File(...)):
     try:
-        # chamada à IA com imagem + prompt
-        response = client.responses.create(
-            model="gpt-4.1-mini",  # pode trocar por gpt-4.1 se quiser algo mais forte
-            input=[
+        img_bytes = await image.read()
+        base64_image = base64.b64encode(img_bytes).decode("utf-8")
+
+        completion = client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                "Você é uma IA de análise técnica. "
+                                "Recebe um print de gráfico de candles "
+                                "e deve responder APENAS um JSON com "
+                                "os campos: acao (COMPRAR, VENDER ou NAO_OPERAR), "
+                                "confianca (0 a 1) e justificativa (frase curta em português)."
+                            ),
+                        }
+                    ],
+                },
                 {
                     "role": "user",
                     "content": [
-                        {"type": "input_text", "text": prompt},
                         {
-                            "type": "input_image",
-                            "image_url": f"data:image/png;base64,{base64_image}",
+                            "type": "text",
+                            "text": "Analise esse gráfico e me diga a melhor decisão.",
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{base64_image}"
+                            },
                         },
                     ],
-                }
+                },
             ],
-            response_format={"type": "json_object"},
-            max_output_tokens=200,
+            temperature=0.2,
+            max_completion_tokens=256,
         )
 
-        # SDK novo tem atalho pra pegar o texto inteiro
-        raw = response.output_text
-        data = json.loads(raw)
+        msg = completion.choices[0].message
+        text = getattr(msg, "content", msg)
 
-        # segurança: garante campos mínimos
+        try:
+            data = json.loads(text)
+        except Exception:
+            # fallback se a IA não respeitar o formato
+            data = {
+                "acao": "NAO_OPERAR",
+                "confianca": 0.5,
+                "justificativa": "Erro ao interpretar resposta da IA.",
+            }
+
         acao = data.get("acao", "NAO_OPERAR")
-        confianca = float(data.get("confianca", 0.0))
+        confianca = float(data.get("confianca", 0.5))
         justificativa = data.get(
             "justificativa",
-            "Não foi possível analisar o gráfico com clareza."
+            "Mercado indefinido. IA recomenda não operar.",
         )
 
         return {
@@ -97,11 +89,9 @@ Regras importantes:
         }
 
     except Exception as e:
-        # log simples no servidor
-        print("Erro na IA:", e)
-        # resposta fallback pro front não quebrar
+        print("Erro ao chamar Groq:", e)
         return {
             "acao": "NAO_OPERAR",
-            "confianca": 0.0,
+            "confianca": 0.5,
             "justificativa": "Erro ao analisar gráfico. Tente novamente mais tarde.",
         }
