@@ -24,10 +24,11 @@ async def root():
     return {"status": "online"}
 
 
-# Aceita /api/analisar E /api/analisar/
-@app.post("/api/analisar")
-@app.post("/api/analisar/")
+# Aceita GET, POST e OPTIONS em /api/analisar e /api/analisar/
+@app.api_route("/api/analisar", methods=["GET", "POST", "OPTIONS"])
+@app.api_route("/api/analisar/", methods=["GET", "POST", "OPTIONS"])
 async def analisar_imagem(image: UploadFile | None = File(None)):
+    # Se não veio imagem (GET sem body, por exemplo), devolve algo padrão
     if image is None:
         return {
             "acao": "NAO_OPERAR",
