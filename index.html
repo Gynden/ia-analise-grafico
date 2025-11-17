@@ -160,7 +160,7 @@
     formData.append("image", selectedFile);
 
     try {
-      const res = await fetch("https://ia-analise-grafico.onrender.com/", {
+      const res = await fetch("https://ia-analise-grafico.onrender.com", {
         method: "POST",
         body: formData,
       });
