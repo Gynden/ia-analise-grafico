@@ -1,4 +1,4 @@
 fastapi
-uvicorn[standard]
+uvicorn
+groq
 python-multipart
-openai>=1.35.0
