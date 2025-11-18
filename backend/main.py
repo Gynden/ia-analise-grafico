@@ -70,4 +70,109 @@ def root():
 
 # -------------------------------------------------------------------------
 # ROTA PRINCIPAL: /api/analisar
-# --------------------------------
+# -------------------------------------------------------------------------
+@app.post("/api/analisar", response_model=AnaliseResponse)
+async def analisar_imagem(image: UploadFile = File(...)):
+    if not image or not image.content_type or not image.content_type.startswith("image/"):
+        logging.warning("Arquivo invalido recebido.")
+        return AnaliseResponse(
+            acao="NAO_OPERAR",
+            confianca=0.0,
+            justificativa="Arquivo invalido. Envie um print do grafico."
+        )
+
+    try:
+        # Prepara imagem
+        img_b64 = preparar_imagem(image)
+
+        # Prompt do sistema (sem acentos pra evitar problema de encoding)
+        sistema = """
+Você é um trader profissional de opções binárias, especialista em M1.
+Seu trabalho é analisar APENAS o gráfico enviado e decidir se vale a pena
+entrar comprado (COMPRAR), vendido (VENDER) ou se é melhor NÃO OPERAR.
+
+Contexto:
+- Timeframe: 1 minuto (M1)
+- Estilo: scalp rápido, operações curtas
+- Objetivo: pegar movimentos com boa probabilidade, evitando entrada aleatória
+
+Regras importantes:
+1) Só marcar COMPRAR ou VENDER se o cenário estiver muito claro.
+2) Se o mercado estiver lateral, confuso ou sem direção forte, responda NAO_OPERAR.
+3) Dê preferência a:
+   - Tendência forte bem definida (sequência de candles na mesma direção).
+   - Pullback claro (correção contra a tendência batendo em região importante).
+   - Rompimentos bem definidos (quebra de suporte/resistência com força).
+4) Evite operar perto de regiões de briga (muita sombra, pavio grande, indecisão).
+5) Você deve ser conservador: se estiver em dúvida, responda NAO_OPERAR.
+
+Formato de resposta:
+Responda APENAS um JSON neste formato exato:
+
+{
+  "acao": "COMPRAR" | "VENDER" | "NAO_OPERAR",
+  "confianca": numero entre 0.0 e 1.0,
+  "justificativa": "texto curto em portugues explicando o motivo"
+}
+"""
+
+        usuario_texto = (
+            "Analise esse grafico de M1 e siga as regras do manual. "
+            "Lembre-se: seja conservador. Se o cenario nao estiver muito claro, responda NAO_OPERAR."
+        )
+
+        logging.info(f"[{datetime.utcnow()}] Iniciando analise na Groq...")
+
+        completion = client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            response_format={"type": "json_object"},
+            temperature=0.2,
+            max_tokens=300,
+            messages=[
+                {"role": "system", "content": sistema},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": usuario_texto},
+                        {"type": "image_url", "image_url": {"url": img_b64}},
+                    ],
+                },
+            ],
+        )
+
+        raw = completion.choices[0].message.content
+        logging.info(f"Resposta bruta da Groq: {raw}")
+
+        data = json.loads(raw)
+
+        acao = str(data.get("acao", "NAO_OPERAR")).upper().strip()
+        if acao not in ("COMPRAR", "VENDER", "NAO_OPERAR"):
+            acao = "NAO_OPERAR"
+
+        try:
+            confianca = float(data.get("confianca", 0.0))
+        except Exception:
+            confianca = 0.0
+
+        justificativa = str(data.get("justificativa", "")).strip()
+        if not justificativa:
+            justificativa = "Cenario indefinido. Melhor nao operar."
+
+        logging.info(
+            f"SAIDA FINAL -> acao={acao}, confianca={confianca:.2f}, "
+            f"justificativa={justificativa[:120]}"
+        )
+
+        return AnaliseResponse(
+            acao=acao,
+            confianca=confianca,
+            justificativa=justificativa
+        )
+
+    except Exception as e:
+        logging.exception("Erro ao analisar grafico com a Groq")
+        return AnaliseResponse(
+            acao="NAO_OPERAR",
+            confianca=0.0,
+            justificativa="Erro ao analisar grafico. Tente novamente mais tarde."
+        )
