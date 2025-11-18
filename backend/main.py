@@ -24,19 +24,10 @@ async def root():
     return {"status": "online"}
 
 
-# Aceita TODOS os métodos em /api/analisar e /api/analisar/
-ALL_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
-
-@app.api_route("/api/analisar", methods=ALL_METHODS)
-@app.api_route("/api/analisar/", methods=ALL_METHODS)
+# Aceita /api/analisar E /api/analisar/
+@app.post("/api/analisar")
+@app.post("/api/analisar/")
 async def analisar_imagem(image: UploadFile | None = File(None)):
-    """
-    - Se vier imagem (POST com FormData), chama a Groq e retorna COMPRAR/VENDER/NAO_OPERAR.
-    - Se NÃO vier imagem (GET, HEAD, OPTIONS, etc.), devolve um JSON padrão.
-    Assim, nunca mais teremos 405 nesse caminho.
-    """
-
-    # Se não veio arquivo (GET, HEAD, OPTIONS...), responde algo padrão
     if image is None:
         return {
             "acao": "NAO_OPERAR",
