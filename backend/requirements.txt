@@ -1,4 +1,5 @@
 fastapi
-uvicorn[standard]
-groq
+uvicorn
 python-multipart
+pillow
+groq
