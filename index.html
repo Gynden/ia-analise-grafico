@@ -6,107 +6,231 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center">
-  <div class="max-w-5xl w-full px-4 py-8">
-    <!-- CARD PRINCIPAL -->
-    <div class="bg-gradient-to-b from-violet-700/80 via-violet-900/80 to-slate-950 rounded-3xl p-6 md:p-8 shadow-[0_0_40px_rgba(0,0,0,0.6)] border border-violet-500/40">
-      <div class="text-center mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold mb-1 flex items-center justify-center gap-2">
-          <span class="text-emerald-300 text-xl">📈</span>
-          <span>Análise de Investimentos</span>
-        </h1>
-        <p class="text-xs md:text-sm text-slate-200">
-          Tire uma foto do gráfico e receba recomendação instantânea da IA.
-        </p>
-      </div>
-
-      <!-- PREVIEW -->
-      <div class="bg-slate-950/70 rounded-3xl border border-slate-800 p-3 mb-4">
-        <div
-          id="preview-container"
-          class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/80 h-52 flex items-center justify-center"
-        >
-          <p id="preview-placeholder" class="text-xs text-slate-500 text-center px-4">
-            Nenhuma imagem selecionada.<br />
-            Envie ou cole um print do gráfico para visualizar aqui.
+<body class="min-h-screen bg-slate-950 text-slate-50">
+  <!-- TOPO -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">📊</span>
+        <div>
+          <h1 class="text-sm font-semibold text-slate-100 uppercase tracking-[0.15em]">
+            Analisador IA M1
+          </h1>
+          <p class="text-[11px] text-slate-400">
+            IA + gerenciamento de risco para operações rápidas
           </p>
-          <img
-            id="preview-image"
-            src=""
-            alt="Preview do gráfico"
-            class="hidden w-full h-full object-cover"
-          />
         </div>
       </div>
 
-      <!-- CONTROLES -->
-      <div class="flex flex-col md:flex-row items-center gap-3 mb-4">
-        <!-- input real (escondido) -->
-        <input id="file-input" type="file" accept="image/*" class="hidden" />
-
-        <!-- label estilizado que abre o seletor de arquivos -->
-        <label
-          for="file-input"
-          class="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 rounded-full bg-slate-900 border border-slate-600 text-xs md:text-sm font-medium hover:border-slate-400 cursor-pointer"
-        >
-          Trocar Imagem
-        </label>
-
-        <button
-          id="analisar-btn"
-          class="w-full md:w-auto px-6 py-3 rounded-full text-xs md:text-sm font-semibold bg-gradient-to-r from-fuchsia-500 to-violet-500 hover:from-fuchsia-400 hover:to-violet-400 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Analisar Gráfico
-        </button>
-
-        <span id="status-text" class="text-[11px] text-slate-300 md:ml-auto">
-          Aguardando imagem...
+      <div class="flex items-center gap-3 text-[11px]">
+        <span id="api-status-badge"
+              class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          API Online
         </span>
       </div>
     </div>
+  </header>
 
-    <!-- RESULTADO -->
-    <div
-      id="resultado-card"
-      class="mt-6 bg-gradient-to-r from-rose-900/80 via-rose-800/80 to-amber-900/80 rounded-3xl p-5 md:p-6 border border-rose-500/40 shadow-[0_0_40px_rgba(0,0,0,0.6)] hidden"
-    >
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold text-slate-200 uppercase tracking-wide">
-          Resposta da IA
-        </span>
-        <span id="conf-text" class="text-[11px] text-slate-200">
-          Confiança: 70%
-        </span>
-      </div>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-6">
+      <!-- COLUNA ESQUERDA: IMAGEM + CONTROLES -->
+      <section class="space-y-4">
+        <!-- CARD IMAGEM -->
+        <div class="bg-gradient-to-b from-violet-700/70 via-violet-900/80 to-slate-950 rounded-3xl p-4 md:p-6 shadow-[0_0_40px_rgba(0,0,0,0.7)] border border-violet-500/40">
+          <div class="flex items-center justify-between mb-4 gap-3">
+            <div>
+              <h2 class="text-base md:text-lg font-semibold flex items-center gap-2">
+                <span class="text-emerald-300 text-lg">📈</span>
+                <span>Análise de Investimentos (M1)</span>
+              </h2>
+              <p class="text-[11px] md:text-xs text-slate-200">
+                Tire um print do gráfico de M1, envie aqui e a IA devolve a leitura do cenário.
+              </p>
+            </div>
+          </div>
 
-      <div class="text-3xl md:text-4xl font-black mb-2" id="acao-text">
-        VENDER
-      </div>
+          <!-- PREVIEW -->
+          <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3 mb-4">
+            <div
+              id="preview-container"
+              class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 h-48 md:h-56 flex items-center justify-center"
+            >
+              <p id="preview-placeholder" class="text-xs text-slate-500 text-center px-4">
+                Nenhuma imagem selecionada.<br />
+                Toque em <span class="font-semibold text-slate-300">Escolher imagem</span> ou cole um print
+                (Ctrl+V / compartilhar do celular) do gráfico M1 aqui.
+              </p>
+              <img
+                id="preview-image"
+                src=""
+                alt="Preview do gráfico"
+                class="hidden w-full h-full object-cover"
+              />
+            </div>
+          </div>
 
-      <p class="text-xs md:text-sm text-slate-100" id="justificativa-text">
-        A IA analisa tendência, topos e fundos, zonas de suporte e resistência
-        para sugerir a melhor decisão.
-      </p>
+          <!-- CONTROLES -->
+          <div class="flex flex-col md:flex-row items-center gap-3">
+            <label class="w-full md:w-auto cursor-pointer">
+              <input id="file-input" type="file" accept="image/*" class="hidden" />
+              <span
+                class="inline-flex items-center justify-center w-full md:w-auto px-5 py-3 rounded-full bg-slate-900 border border-slate-600 text-xs md:text-sm font-medium hover:border-slate-300 transition-colors"
+              >
+                Escolher imagem
+              </span>
+            </label>
+
+            <button
+              id="analisar-btn"
+              class="w-full md:w-auto px-6 py-3 rounded-full text-xs md:text-sm font-semibold bg-gradient-to-r from-fuchsia-500 to-violet-500 hover:from-fuchsia-400 hover:to-violet-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Analisar gráfico
+            </button>
+
+            <span id="status-text" class="text-[11px] text-slate-300 md:ml-auto">
+              Aguardando imagem...
+            </span>
+          </div>
+        </div>
+
+        <!-- CARD MODO DE RISCO -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-100">
+                Perfil de risco da IA
+              </h3>
+              <p class="text-[11px] text-slate-400">
+                Define quanta confiança mínima a IA precisa para liberar uma entrada.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button
+              data-risk="conservador"
+              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-emerald-500/60 bg-emerald-500/10 text-emerald-200"
+            >
+              Conservador (75%+)
+            </button>
+            <button
+              data-risk="moderado"
+              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+            >
+              Moderado (60%+)
+            </button>
+            <button
+              data-risk="agressivo"
+              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+            >
+              Agressivo (50%+)
+            </button>
+          </div>
+
+          <p class="text-[11px] text-slate-400">
+            <span class="font-semibold text-slate-200">Regra:</span>
+            se a confiança da IA vier abaixo do mínimo do perfil, o app força
+            <span class="font-semibold text-amber-300">NÃO OPERAR</span>.
+          </p>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: RESULTADO + HISTÓRICO -->
+      <section class="space-y-4">
+        <!-- RESULTADO -->
+        <div
+          id="resultado-card"
+          class="bg-gradient-to-r from-rose-900/85 via-rose-800/85 to-amber-900/85 rounded-3xl p-5 md:p-6 border border-rose-500/50 shadow-[0_0_40px_rgba(0,0,0,0.7)] hidden"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+              Resposta da IA
+            </span>
+            <span id="conf-text" class="text-[11px] text-slate-200">
+              Confiança: 0%
+            </span>
+          </div>
+
+          <div class="text-3xl md:text-4xl font-black mb-2" id="acao-text">
+            N&Atilde;O OPERAR
+          </div>
+
+          <p class="text-xs md:text-sm text-slate-100" id="justificativa-text">
+            A IA analisa tendência, topos e fundos, zonas de suporte e resistência
+            para sugerir a melhor decisão.
+          </p>
+
+          <p id="filtro-text" class="mt-3 text-[11px] text-slate-200"></p>
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <h3 class="text-sm font-semibold text-slate-100">
+              Histórico recente
+            </h3>
+            <span class="text-[11px] text-slate-400" id="hist-count">
+              Nenhuma análise ainda
+            </span>
+          </div>
+
+          <div class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60">
+            <table class="min-w-full text-[11px] md:text-xs">
+              <thead class="bg-slate-900/80 text-slate-300">
+                <tr>
+                  <th class="px-3 py-2 text-left font-medium">Hora</th>
+                  <th class="px-3 py-2 text-left font-medium">Ação</th>
+                  <th class="px-3 py-2 text-left font-medium">Confiança</th>
+                  <th class="px-3 py-2 text-left font-medium">Perfil</th>
+                </tr>
+              </thead>
+              <tbody id="hist-body" class="divide-y divide-slate-800 text-slate-200">
+                <!-- preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-3 text-[11px] text-slate-400">
+            Esse histórico é apenas local (no navegador) e some se você recarregar a página.
+          </p>
+        </div>
+      </section>
     </div>
-  </div>
+  </main>
 
   <script>
+    // ----------------- ELEMENTOS -----------------
     const fileInput = document.getElementById("file-input");
     const previewImage = document.getElementById("preview-image");
     const previewPlaceholder = document.getElementById("preview-placeholder");
     const analisarBtn = document.getElementById("analisar-btn");
     const statusText = document.getElementById("status-text");
-
     const resultadoCard = document.getElementById("resultado-card");
     const acaoText = document.getElementById("acao-text");
     const confText = document.getElementById("conf-text");
     const justificativaText = document.getElementById("justificativa-text");
+    const filtroText = document.getElementById("filtro-text");
 
+    const histBody = document.getElementById("hist-body");
+    const histCount = document.getElementById("hist-count");
+
+    const riskButtons = document.querySelectorAll(".risk-btn");
+
+    // ----------------- ESTADO -----------------
     let selectedFile = null;
+    let currentRisk = "conservador";
 
-    // ROTA EXATA DO BACKEND
+    const RISK_PROFILES = {
+      conservador: 0.75,
+      moderado: 0.6,
+      agressivo: 0.5,
+    };
+
     const BACKEND_URL = "https://ia-analise-grafico.onrender.com/api/analisar";
 
+    // ----------------- HELPER: SETAR IMAGEM -----------------
     function setImageFile(file) {
       if (!file) return;
 
@@ -121,13 +245,17 @@
       statusText.textContent = "Imagem carregada. Pronto para analisar.";
     }
 
-    // Quando o usuário escolhe o arquivo (tanto no PC quanto no celular)
+    // Abrir seletor ao clicar no label
+    document.querySelector("label").addEventListener("click", () => {
+      fileInput.click();
+    });
+
     fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       setImageFile(file);
     });
 
-    // Permitir colar print diretamente (Ctrl+V) - funciona melhor no PC
+    // Permitir colar print diretamente (Ctrl+V / compartilhar)
     document.addEventListener("paste", (e) => {
       const clipboard = e.clipboardData || window.clipboardData;
       if (!clipboard) return;
@@ -156,6 +284,85 @@
       }
     });
 
+    // ----------------- SELETOR DE RISCO -----------------
+    riskButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const risk = btn.getAttribute("data-risk");
+        currentRisk = risk;
+
+        riskButtons.forEach((b) => {
+          b.classList.remove(
+            "border-emerald-500/60",
+            "bg-emerald-500/10",
+            "text-emerald-200"
+          );
+          b.classList.add("border-slate-600", "bg-slate-900", "text-slate-200");
+        });
+
+        btn.classList.remove("border-slate-600", "bg-slate-900", "text-slate-200");
+        btn.classList.add(
+          "border-emerald-500/60",
+          "bg-emerald-500/10",
+          "text-emerald-200"
+        );
+      });
+    });
+
+    // ----------------- HISTÓRICO -----------------
+    const history = [];
+
+    function addToHistory(acao, conf, perfil) {
+      const agora = new Date();
+      const hora = agora.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
+      history.unshift({ hora, acao, conf, perfil });
+      if (history.length > 10) history.pop();
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      histBody.innerHTML = "";
+      if (history.length === 0) {
+        histCount.textContent = "Nenhuma análise ainda";
+        return;
+      }
+
+      histCount.textContent = `${history.length} análise(s) nessa sessão`;
+
+      history.forEach((item) => {
+        const tr = document.createElement("tr");
+
+        const tdHora = document.createElement("td");
+        tdHora.className = "px-3 py-2 whitespace-nowrap";
+        tdHora.textContent = item.hora;
+
+        const tdAcao = document.createElement("td");
+        tdAcao.className = "px-3 py-2";
+        tdAcao.textContent = item.acao;
+
+        const tdConf = document.createElement("td");
+        tdConf.className = "px-3 py-2";
+        tdConf.textContent = (item.conf * 100).toFixed(0) + "%";
+
+        const tdPerfil = document.createElement("td");
+        tdPerfil.className = "px-3 py-2 capitalize";
+        tdPerfil.textContent = item.perfil;
+
+        tr.appendChild(tdHora);
+        tr.appendChild(tdAcao);
+        tr.appendChild(tdConf);
+        tr.appendChild(tdPerfil);
+
+        histBody.appendChild(tr);
+      });
+    }
+
+    // ----------------- BOTÃO ANALISAR -----------------
     analisarBtn.addEventListener("click", async () => {
       if (!selectedFile) {
         alert("Selecione ou cole primeiro o print do gráfico.");
@@ -165,9 +372,10 @@
       analisarBtn.disabled = true;
       statusText.textContent = "Analisando gráfico com IA...";
       resultadoCard.classList.add("hidden");
+      filtroText.textContent = "";
 
       const formData = new FormData();
-      formData.append("image", selectedFile); // nome do campo = 'image'
+      formData.append("image", selectedFile);
 
       try {
         const res = await fetch(BACKEND_URL, {
@@ -186,20 +394,30 @@
         const data = await res.json();
         console.log("Resposta da IA:", data);
 
-        const acao = data.acao || "NAO_OPERAR";
-        const conf = data.confianca ?? 0.5;
+        let acao = (data.acao || "NAO_OPERAR").toUpperCase();
+        const conf = data.confianca ?? 0.0;
         const justificativa =
           data.justificativa ||
           "Mercado indefinido. IA recomenda não operar neste momento.";
 
-        if (acao === "COMPRAR") {
+        const minConf = RISK_PROFILES[currentRisk] ?? 0.6;
+        let acaoFinal = acao;
+        let aplicouFiltro = false;
+
+        if (conf < minConf && acao !== "NAO_OPERAR") {
+          acaoFinal = "NAO_OPERAR";
+          aplicouFiltro = true;
+        }
+
+        // Estiliza texto da ação
+        if (acaoFinal === "COMPRAR") {
           acaoText.textContent = "COMPRAR";
           acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-emerald-400";
-        } else if (acao === "VENDER") {
+            "text-3xl md:text-4xl font-black mb-2 text-emerald-300";
+        } else if (acaoFinal === "VENDER") {
           acaoText.textContent = "VENDER";
           acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-rose-300";
+            "text-3xl md:text-4xl font-black mb-2 text-rose-200";
         } else {
           acaoText.textContent = "NÃO OPERAR";
           acaoText.className =
@@ -209,8 +427,24 @@
         confText.textContent = "Confiança: " + (conf * 100).toFixed(0) + "%";
         justificativaText.textContent = justificativa;
 
+        if (aplicouFiltro) {
+          filtroText.textContent =
+            "Aplicado filtro do perfil " +
+            currentRisk +
+            ": como a confiança veio abaixo de " +
+            (minConf * 100).toFixed(0) +
+            "%, o sistema forçou NÃO OPERAR.";
+        } else {
+          filtroText.textContent =
+            "Decisão alinhada com o perfil " +
+            currentRisk +
+            ". Nenhum filtro adicional foi aplicado.";
+        }
+
         resultadoCard.classList.remove("hidden");
         statusText.textContent = "Análise concluída.";
+
+        addToHistory(acaoFinal, conf, currentRisk);
       } catch (err) {
         console.error("Erro no fetch:", err);
         statusText.textContent = "Erro ao analisar. Tente novamente.";
