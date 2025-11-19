@@ -76,7 +76,9 @@
             </div>
 
             <!-- PREVIEW -->
-            <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3 mb-4">
+            <div
+              class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3 mb-4"
+            >
               <div
                 id="preview-container"
                 class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 h-48 md:h-56 flex items-center justify-center"
@@ -121,7 +123,7 @@
                 type="button"
                 class="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-5 py-2.5 text-xs md:text-sm font-semibold text-white shadow-lg shadow-violet-500/40 hover:bg-violet-400 transition"
               >
-                <span>Analizar gráfico</span>
+                <span>Analisar gráfico</span>
               </button>
 
               <span
@@ -333,10 +335,7 @@
               </span>
             </div>
 
-            <div
-              class="text-3xl md:text-4xl font-black mb-1"
-              id="acao-text"
-            >
+            <div class="text-3xl md:text-4xl font-black mb-1" id="acao-text">
               NÃO OPERAR
             </div>
 
@@ -405,7 +404,9 @@
               Dashboard da sessão
             </h3>
             <div class="grid grid-cols-2 gap-3 text-[11px] md:text-xs">
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Total de análises</p>
                 <p
                   id="sess-total-analises"
@@ -415,7 +416,9 @@
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Confiança média</p>
                 <p
                   id="sess-avg-conf"
@@ -425,7 +428,9 @@
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Entradas executadas</p>
                 <p
                   id="sess-executadas"
@@ -441,7 +446,9 @@
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Distribuição de sinais</p>
                 <p
                   id="sess-dist-text"
@@ -463,17 +470,18 @@
             <p class="text-[11px] text-slate-400 mb-2" id="dia-subtitle"></p>
 
             <div class="grid grid-cols-2 gap-3 text-[11px] md:text-xs">
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Análises de hoje</p>
-                <p
-                  id="dia-analises"
-                  class="text-lg font-semibold text-slate-50"
-                >
+                <p id="dia-analises" class="text-lg font-semibold text-slate-50">
                   0
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Entradas executadas hoje</p>
                 <p
                   id="dia-executadas"
@@ -483,7 +491,9 @@
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Confiança média hoje</p>
                 <p
                   id="dia-avg-conf"
@@ -493,7 +503,9 @@
                 </p>
               </div>
 
-              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+              <div
+                class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3"
+              >
                 <p class="text-slate-400 mb-1">Distribuição</p>
                 <p
                   id="dia-dist-text"
@@ -528,16 +540,16 @@
         const fileInput = document.getElementById("file-input");
         const selectImageBtn = document.getElementById("select-image-btn");
         const previewImage = document.getElementById("preview-image");
-        const previewPlaceholder = document.getElementById(
-          "preview-placeholder"
-        );
+        const previewPlaceholder =
+          document.getElementById("preview-placeholder");
         const analisarBtn = document.getElementById("analisar-btn");
         const statusText = document.getElementById("status-text");
         const timeframeLabel = document.getElementById("timeframe-label");
         const apiStatus = document.getElementById("api-status");
 
         const stakeText = document.getElementById("stake-text");
-        const resumoStakeText = document.getElementById("resumo-stake-text");
+        const resumoStakeText =
+          document.getElementById("resumo-stake-text");
 
         const resultadoCard = document.getElementById("resultado-card");
         const acaoText = document.getElementById("acao-text");
@@ -549,9 +561,8 @@
         const histBody = document.getElementById("hist-body");
         const histCount = document.getElementById("hist-count");
 
-        const sessTotalAnalises = document.getElementById(
-          "sess-total-analises"
-        );
+        const sessTotalAnalises =
+          document.getElementById("sess-total-analises");
         const sessAvgConf = document.getElementById("sess-avg-conf");
         const sessExecutadas = document.getElementById("sess-executadas");
         const sessMetaText = document.getElementById("sess-meta-text");
@@ -570,10 +581,10 @@
         const riskValueButtons =
           document.querySelectorAll(".risk-value-btn");
 
-        const metaEntradasInput = document.getElementById(
-          "meta-entradas-input"
-        );
-        const salvarPlanoBtn = document.getElementById("salvar-plano-btn");
+        const metaEntradasInput =
+          document.getElementById("meta-entradas-input");
+        const salvarPlanoBtn =
+          document.getElementById("salvar-plano-btn");
         const planoResumoText =
           document.getElementById("plano-resumo-text");
 
@@ -932,7 +943,10 @@
               b.classList.remove(
                 "border-emerald-500/60",
                 "bg-emerald-500/10",
-                "text-emerald-200"
+                "text-emerald-200",
+                "border-violet-500/70",
+                "bg-violet-500/10",
+                "text-violet-100"
               )
             );
             if (value === "conservador") {
@@ -1025,16 +1039,8 @@
 
           try {
             const formData = new FormData();
-formData.append("image", selectedFile); // ✅ nome certo
+            formData.append("image", selectedFile); // campo que o backend espera
 
-// se você estiver adicionando mais coisas, pode manter:
-formData.append("risk_profile", perfilDescricao);
-formData.append("timeframe", currentTimeframe);
-formData.append("banca", String(bancaAtual || ""));
-formData.append("risco_percentual", String(riskPercent || ""));
-
-
-            // Envia o perfil como texto mais completo (a API só vê uma string)
             const perfilDescricao =
               currentRisk.toUpperCase() +
               " - gráfico " +
@@ -1045,6 +1051,7 @@ formData.append("risco_percentual", String(riskPercent || ""));
               (riskPercent
                 ? " - risco " + riskPercent + "% por operação"
                 : "");
+
             formData.append("risk_profile", perfilDescricao);
             formData.append("timeframe", currentTimeframe);
             formData.append("banca", String(bancaAtual || ""));
@@ -1058,16 +1065,40 @@ formData.append("risco_percentual", String(riskPercent || ""));
               body: formData,
             });
 
+            const rawText = await res.text();
+            console.log("Resposta da IA:", res.status, rawText);
+
             if (!res.ok) {
-              throw new Error("HTTP " + res.status);
+              alert(
+                "Erro no servidor de IA: HTTP " +
+                  res.status +
+                  "\n\n" +
+                  rawText.slice(0, 200)
+              );
+              statusText.textContent =
+                "Erro ao analisar. Tente novamente.";
+              return;
             }
 
-            const data = await res.json();
+            let data;
+            try {
+              data = JSON.parse(rawText);
+            } catch (e) {
+              console.error("Erro ao parsear JSON:", e);
+              alert(
+                "Servidor retornou uma resposta inválida (não é JSON). Veja o console (F12 → Console)."
+              );
+              statusText.textContent =
+                "Erro ao analisar. Tente novamente.";
+              return;
+            }
 
             let acao = (data.acao || "NAO_OPERAR").toUpperCase();
             let rawConf = data.confianca ?? 0;
             let conf =
-              rawConf <= 1 ? Math.round(rawConf * 100) : Math.round(rawConf);
+              rawConf <= 1
+                ? Math.round(rawConf * 100)
+                : Math.round(rawConf);
             if (conf < 0) conf = 0;
             if (conf > 100) conf = 100;
 
@@ -1075,7 +1106,7 @@ formData.append("risco_percentual", String(riskPercent || ""));
               data.justificativa ||
               "A IA não retornou justificativa detalhada.";
 
-            // Aplica filtro de perfil (força NAO_OPERAR se confiança < mínima)
+            // Aplica filtro de perfil
             const minConf = MIN_CONF[currentRisk] ?? 75;
             let acaoFinal = acao;
             let filtroMensagem = "";
@@ -1099,13 +1130,13 @@ formData.append("risco_percentual", String(riskPercent || ""));
                 "%.";
             }
 
-            // Calcula stake da operação
+            // Calcula stake
             let stake = null;
             if (bancaAtual > 0 && riskPercent > 0) {
               stake = (bancaAtual * riskPercent) / 100;
             }
 
-            // Atualiza UI de resultado
+            // Atualiza UI
             confText.textContent = "Confiança: " + conf + "%";
             acaoText.textContent = acaoFinal.replace("_", " ");
             justificativaText.textContent = justificativa;
@@ -1117,7 +1148,7 @@ formData.append("risco_percentual", String(riskPercent || ""));
 
             statusText.textContent = "Análise concluída.";
 
-            // Monta item de histórico
+            // Histórico
             const now = new Date();
             const entry = {
               timestamp: now.toISOString(),
@@ -1140,10 +1171,10 @@ formData.append("risco_percentual", String(riskPercent || ""));
 
             addToHistory(entry);
           } catch (err) {
-            console.error("Erro no fetch:", err);
+            console.error("Erro de rede ou CORS:", err);
             statusText.textContent =
-              "Erro ao analisar. Tente novamente.";
-            alert("Erro ao conectar com o servidor de IA.");
+              "Erro ao analisar. Verifique sua conexão ou tente novamente.";
+            alert("Erro ao conectar com o servidor de IA: " + err.message);
           } finally {
             analisarBtn.disabled = false;
             analisarBtn.classList.remove(
