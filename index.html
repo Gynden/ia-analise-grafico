@@ -1,458 +1,1162 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Análise de Investimentos com IA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen bg-slate-950 text-slate-50">
-  <!-- TOPO -->
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <span class="text-xl">📊</span>
-        <div>
-          <h1 class="text-sm font-semibold text-slate-100 uppercase tracking-[0.15em]">
-            Analisador IA M1
-          </h1>
-          <p class="text-[11px] text-slate-400">
-            IA + gerenciamento de risco para operações rápidas
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3 text-[11px]">
-        <span id="api-status-badge"
-              class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          API Online
-        </span>
-      </div>
-    </div>
-  </header>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <div class="grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-6">
-      <!-- COLUNA ESQUERDA: IMAGEM + CONTROLES -->
-      <section class="space-y-4">
-        <!-- CARD IMAGEM -->
-        <div class="bg-gradient-to-b from-violet-700/70 via-violet-900/80 to-slate-950 rounded-3xl p-4 md:p-6 shadow-[0_0_40px_rgba(0,0,0,0.7)] border border-violet-500/40">
-          <div class="flex items-center justify-between mb-4 gap-3">
-            <div>
-              <h2 class="text-base md:text-lg font-semibold flex items-center gap-2">
-                <span class="text-emerald-300 text-lg">📈</span>
-                <span>Análise de Investimentos (M1)</span>
-              </h2>
-              <p class="text-[11px] md:text-xs text-slate-200">
-                Tire um print do gráfico de M1, envie aqui e a IA devolve a leitura do cenário.
-              </p>
-            </div>
-          </div>
-
-          <!-- PREVIEW -->
-          <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3 mb-4">
-            <div
-              id="preview-container"
-              class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 h-48 md:h-56 flex items-center justify-center"
-            >
-              <p id="preview-placeholder" class="text-xs text-slate-500 text-center px-4">
-                Nenhuma imagem selecionada.<br />
-                Toque em <span class="font-semibold text-slate-300">Escolher imagem</span> ou cole um print
-                (Ctrl+V / compartilhar do celular) do gráfico M1 aqui.
-              </p>
-              <img
-                id="preview-image"
-                src=""
-                alt="Preview do gráfico"
-                class="hidden w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          <!-- CONTROLES -->
-          <div class="flex flex-col md:flex-row items-center gap-3">
-            <label class="w-full md:w-auto cursor-pointer">
-              <input id="file-input" type="file" accept="image/*" class="hidden" />
-              <span
-                class="inline-flex items-center justify-center w-full md:w-auto px-5 py-3 rounded-full bg-slate-900 border border-slate-600 text-xs md:text-sm font-medium hover:border-slate-300 transition-colors"
-              >
-                Escolher imagem
+  <head>
+    <meta charset="UTF-8" />
+    <title>Análise de Investimentos com IA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-50">
+    <!-- TOPO -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+      <div
+        class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📊</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold tracking-tight">
+                ANALISADOR IA M1
               </span>
-            </label>
-
-            <button
-              id="analisar-btn"
-              class="w-full md:w-auto px-6 py-3 rounded-full text-xs md:text-sm font-semibold bg-gradient-to-r from-fuchsia-500 to-violet-500 hover:from-fuchsia-400 hover:to-violet-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Analisar gráfico
-            </button>
-
-            <span id="status-text" class="text-[11px] text-slate-300 md:ml-auto">
-              Aguardando imagem...
-            </span>
+              <span
+                class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
+              >
+                BETA
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">
+              IA + gerenciamento de risco para operações rápidas.
+            </p>
           </div>
         </div>
 
-        <!-- CARD MODO DE RISCO -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5">
-          <div class="flex items-center justify-between gap-3 mb-3">
-            <div>
-              <h3 class="text-sm font-semibold text-slate-100">
-                Perfil de risco da IA
-              </h3>
-              <p class="text-[11px] text-slate-400">
-                Define quanta confiança mínima a IA precisa para liberar uma entrada.
-              </p>
+        <div class="flex items-center gap-2">
+          <span
+            id="api-status"
+            class="px-3 py-1 rounded-full text-[11px] font-medium border border-emerald-500/60 bg-emerald-500/10 text-emerald-200 flex items-center gap-1"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            API Online
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <!-- GRID PRINCIPAL -->
+      <section
+        class="grid gap-6 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)] items-start"
+      >
+        <!-- COLUNA ESQUERDA -->
+        <section class="space-y-4">
+          <!-- CARD PRINCIPAL -->
+          <div
+            class="bg-gradient-to-b from-violet-700/80 via-violet-900/80 to-slate-950 rounded-3xl p-5 md:p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-violet-500/40"
+          >
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 class="text-sm md:text-base font-semibold text-slate-50">
+                  Análise de Investimentos
+                  <span id="timeframe-label" class="text-xs text-violet-200">
+                    (M1)
+                  </span>
+                </h2>
+                <p class="text-[11px] md:text-xs text-violet-100/90">
+                  Tire um print do gráfico, envie aqui e a IA devolve a leitura
+                  do cenário.
+                </p>
+              </div>
+              <span
+                id="status-text"
+                class="text-[11px] text-slate-200 md:ml-auto"
+              >
+                Aguardando imagem...
+              </span>
+            </div>
+
+            <!-- PREVIEW -->
+            <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3 mb-4">
+              <div
+                id="preview-container"
+                class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 h-48 md:h-56 flex items-center justify-center"
+              >
+                <p
+                  id="preview-placeholder"
+                  class="text-xs text-slate-500 text-center px-4"
+                >
+                  Nenhuma imagem selecionada.<br />
+                  Clique em
+                  <span class="font-semibold text-slate-300">Escolher imagem</span>
+                  ou cole um print do gráfico aqui.
+                </p>
+                <img
+                  id="preview-image"
+                  src=""
+                  alt="Preview do gráfico"
+                  class="hidden w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <!-- CONTROLES -->
+            <div class="flex flex-col md:flex-row items-center gap-3">
+              <button
+                id="select-image-btn"
+                type="button"
+                class="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900/90 border border-slate-700 px-4 py-2.5 text-xs md:text-sm font-medium text-slate-100 hover:bg-slate-800 transition"
+              >
+                <span>Escolher imagem</span>
+                <span class="text-slate-400 text-xs">(PNG / JPG)</span>
+              </button>
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                class="hidden"
+              />
+
+              <button
+                id="analisar-btn"
+                type="button"
+                class="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-5 py-2.5 text-xs md:text-sm font-semibold text-white shadow-lg shadow-violet-500/40 hover:bg-violet-400 transition"
+              >
+                <span>Analyzar gráfico</span>
+              </button>
+
+              <span
+                class="text-[10px] text-violet-100/80 md:ml-auto md:text-right"
+              >
+                Dica: use prints limpos, sem muitos indicadores.
+              </span>
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-2 mb-3">
-            <button
-              data-risk="conservador"
-              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-emerald-500/60 bg-emerald-500/10 text-emerald-200"
-            >
-              Conservador (75%+)
-            </button>
-            <button
-              data-risk="moderado"
-              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
-            >
-              Moderado (60%+)
-            </button>
-            <button
-              data-risk="agressivo"
-              class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
-            >
-              Agressivo (50%+)
-            </button>
+          <!-- CARD PERFIL + TIMEFRAME -->
+          <div
+            class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5 space-y-4"
+          >
+            <div class="flex flex-col md:flex-row md:items-start gap-4">
+              <div class="flex-1">
+                <h3 class="text-sm font-semibold text-slate-100 mb-1">
+                  Perfil de risco da IA
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3">
+                  Define quanta confiança mínima a IA precisa para liberar uma
+                  entrada.
+                </p>
+
+                <div class="flex flex-wrap gap-2 mb-1">
+                  <button
+                    data-risk="conservador"
+                    class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-emerald-500/60 bg-emerald-500/10 text-emerald-200"
+                  >
+                    Conservador (75%+)
+                  </button>
+                  <button
+                    data-risk="moderado"
+                    class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+                  >
+                    Moderado (60%+)
+                  </button>
+                  <button
+                    data-risk="agressivo"
+                    class="risk-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+                  >
+                    Agressivo (50%+)
+                  </button>
+                </div>
+
+                <p class="text-[11px] text-slate-400">
+                  <span class="font-semibold text-slate-200">Regra:</span>
+                  se a confiança vier abaixo do mínimo do perfil, o app força
+                  <span class="font-semibold text-amber-300">NÃO OPERAR</span>.
+                </p>
+              </div>
+
+              <div class="w-px bg-slate-800 hidden md:block"></div>
+
+              <div class="flex-1">
+                <h3 class="text-sm font-semibold text-slate-100 mb-1">
+                  Timeframe do gráfico
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3">
+                  Informe em qual tempo o gráfico foi capturado para ajudar a IA
+                  a ajustar a leitura.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    data-timeframe="M1"
+                    class="timeframe-btn px-3 py-2 rounded-full text-xs font-medium border border-violet-500/70 bg-violet-500/15 text-violet-100"
+                  >
+                    M1
+                  </button>
+                  <button
+                    data-timeframe="M5"
+                    class="timeframe-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+                  >
+                    M5
+                  </button>
+                  <button
+                    data-timeframe="M15"
+                    class="timeframe-btn px-3 py-2 rounded-full text-xs font-medium border border-slate-600 bg-slate-900 text-slate-200"
+                  >
+                    M15
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <p class="text-[11px] text-slate-400">
-            <span class="font-semibold text-slate-200">Regra:</span>
-            se a confiança da IA vier abaixo do mínimo do perfil, o app força
-            <span class="font-semibold text-amber-300">NÃO OPERAR</span>.
-          </p>
-        </div>
-      </section>
+          <!-- CARD BANCA + PLANO -->
+          <div
+            class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5 space-y-4"
+          >
+            <div class="grid gap-4 md:grid-cols-2">
+              <!-- BANCA -->
+              <div>
+                <h3 class="text-sm font-semibold text-slate-100 mb-1">
+                  Gerenciamento de banca
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3">
+                  Informe a banca e o risco por operação. Isso é usado apenas
+                  para simulação educativa.
+                </p>
 
-      <!-- COLUNA DIREITA: RESULTADO + HISTÓRICO -->
-      <section class="space-y-4">
-        <!-- RESULTADO -->
-        <div
-          id="resultado-card"
-          class="bg-gradient-to-r from-rose-900/85 via-rose-800/85 to-amber-900/85 rounded-3xl p-5 md:p-6 border border-rose-500/50 shadow-[0_0_40px_rgba(0,0,0,0.7)] hidden"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-200 uppercase tracking-wide">
-              Resposta da IA
-            </span>
-            <span id="conf-text" class="text-[11px] text-slate-200">
-              Confiança: 0%
-            </span>
+                <label
+                  class="block text-[11px] text-slate-300 mb-1"
+                  for="banca-input"
+                  >Banca (R$)</label
+                >
+                <input
+                  id="banca-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+                  placeholder="Ex: 200"
+                />
+
+                <p class="text-[11px] text-slate-400 mt-3 mb-1">
+                  Risco por operação:
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    data-risk-value="0.5"
+                    class="risk-value-btn px-3 py-1.5 rounded-full text-[11px] font-medium border border-slate-700 bg-slate-900 text-slate-200"
+                  >
+                    0,5%
+                  </button>
+                  <button
+                    type="button"
+                    data-risk-value="1"
+                    class="risk-value-btn px-3 py-1.5 rounded-full text-[11px] font-medium border border-violet-500/70 bg-violet-500/10 text-violet-100"
+                  >
+                    1%
+                  </button>
+                  <button
+                    type="button"
+                    data-risk-value="2"
+                    class="risk-value-btn px-3 py-1.5 rounded-full text-[11px] font-medium border border-slate-700 bg-slate-900 text-slate-200"
+                  >
+                    2%
+                  </button>
+                </div>
+
+                <p
+                  id="stake-text"
+                  class="mt-3 text-[11px] text-slate-300 font-medium"
+                >
+                  Stake sugerida: —
+                </p>
+              </div>
+
+              <!-- PLANO DE SESSÃO -->
+              <div>
+                <h3 class="text-sm font-semibold text-slate-100 mb-1">
+                  Plano da sessão
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3">
+                  Defina quantas entradas pretende fazer na sessão. Isso não
+                  bloqueia nada, apenas te ajuda a respeitar o plano.
+                </p>
+
+                <label
+                  class="block text-[11px] text-slate-300 mb-1"
+                  for="meta-entradas-input"
+                  >Meta de entradas executadas</label
+                >
+                <input
+                  id="meta-entradas-input"
+                  type="number"
+                  min="1"
+                  step="1"
+                  class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+                  placeholder="Ex: 10"
+                />
+
+                <button
+                  id="salvar-plano-btn"
+                  type="button"
+                  class="mt-3 inline-flex items-center justify-center rounded-full bg-slate-800 px-4 py-2 text-[11px] font-medium text-slate-100 hover:bg-slate-700 transition"
+                >
+                  Salvar plano da sessão
+                </button>
+
+                <p
+                  id="plano-resumo-text"
+                  class="mt-2 text-[11px] text-slate-400"
+                >
+                  Nenhum plano definido ainda.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUNA DIREITA -->
+        <section class="space-y-4">
+          <!-- RESULTADO -->
+          <div
+            id="resultado-card"
+            class="bg-gradient-to-r from-rose-900/85 via-rose-800/85 to-amber-800/80 border border-rose-500/50 rounded-3xl p-4 md:p-5 shadow-[0_0_40px_rgba(0,0,0,0.7)] hidden"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <span
+                class="text-xs font-semibold text-slate-200 uppercase tracking-wide"
+              >
+                Resposta da IA
+              </span>
+              <span id="conf-text" class="text-[11px] text-slate-200">
+                Confiança: 0%
+              </span>
+            </div>
+
+            <div
+              class="text-3xl md:text-4xl font-black mb-1"
+              id="acao-text"
+            >
+              NÃO OPERAR
+            </div>
+
+            <p
+              class="text-[11px] md:text-sm text-slate-100 mb-2"
+              id="justificativa-text"
+            >
+              A IA analisa tendência, topos e fundos, zonas de suporte e
+              resistência para sugerir a melhor decisão.
+            </p>
+
+            <p class="text-[11px] text-slate-100/80" id="resumo-stake-text">
+              Stake para esta análise: —
+            </p>
+
+            <p id="filtro-text" class="mt-2 text-[10px] text-slate-200/80"></p>
           </div>
 
-          <div class="text-3xl md:text-4xl font-black mb-2" id="acao-text">
-            N&Atilde;O OPERAR
+          <!-- HISTÓRICO -->
+          <div
+            class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5"
+          >
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <h3 class="text-sm font-semibold text-slate-100">
+                Histórico recente
+              </h3>
+              <span class="text-[11px] text-slate-400" id="hist-count">
+                Nenhuma análise ainda
+              </span>
+            </div>
+
+            <div
+              class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60"
+            >
+              <table class="min-w-full text-[11px] md:text-xs">
+                <thead class="bg-slate-900/80 text-slate-300">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-medium">Hora</th>
+                    <th class="px-3 py-2 text-left font-medium">Ação</th>
+                    <th class="px-3 py-2 text-left font-medium">Confiança</th>
+                    <th class="px-3 py-2 text-left font-medium">Perfil</th>
+                    <th class="px-3 py-2 text-left font-medium">TF</th>
+                    <th class="px-3 py-2 text-left font-medium">Stake</th>
+                    <th class="px-3 py-2 text-left font-medium">Executada?</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="hist-body"
+                  class="divide-y divide-slate-800 text-slate-200"
+                >
+                  <!-- preenchido via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <p class="mt-2 text-[10px] text-slate-500">
+              Esse histórico é salvo localmente no seu navegador (localStorage).
+            </p>
           </div>
 
-          <p class="text-xs md:text-sm text-slate-100" id="justificativa-text">
-            A IA analisa tendência, topos e fundos, zonas de suporte e resistência
-            para sugerir a melhor decisão.
-          </p>
-
-          <p id="filtro-text" class="mt-3 text-[11px] text-slate-200"></p>
-        </div>
-
-        <!-- HISTÓRICO -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5">
-          <div class="flex items-center justify-between gap-3 mb-3">
-            <h3 class="text-sm font-semibold text-slate-100">
-              Histórico recente
+          <!-- DASHBOARD SESSÃO -->
+          <div
+            class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5 space-y-3"
+          >
+            <h3 class="text-sm font-semibold text-slate-100 mb-1">
+              Dashboard da sessão
             </h3>
-            <span class="text-[11px] text-slate-400" id="hist-count">
-              Nenhuma análise ainda
-            </span>
+            <div class="grid grid-cols-2 gap-3 text-[11px] md:text-xs">
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Total de análises</p>
+                <p
+                  id="sess-total-analises"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Confiança média</p>
+                <p
+                  id="sess-avg-conf"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0%
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Entradas executadas</p>
+                <p
+                  id="sess-executadas"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0
+                </p>
+                <p
+                  id="sess-meta-text"
+                  class="text-[10px] text-slate-400 mt-0.5"
+                >
+                  Meta: —
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Distribuição de sinais</p>
+                <p
+                  id="sess-dist-text"
+                  class="text-[11px] text-slate-200 leading-relaxed"
+                >
+                  C: 0 • V: 0 • N: 0
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60">
-            <table class="min-w-full text-[11px] md:text-xs">
-              <thead class="bg-slate-900/80 text-slate-300">
-                <tr>
-                  <th class="px-3 py-2 text-left font-medium">Hora</th>
-                  <th class="px-3 py-2 text-left font-medium">Ação</th>
-                  <th class="px-3 py-2 text-left font-medium">Confiança</th>
-                  <th class="px-3 py-2 text-left font-medium">Perfil</th>
-                </tr>
-              </thead>
-              <tbody id="hist-body" class="divide-y divide-slate-800 text-slate-200">
-                <!-- preenchido via JS -->
-              </tbody>
-            </table>
-          </div>
+          <!-- RESUMO DIÁRIO -->
+          <div
+            class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 md:p-5 space-y-2"
+          >
+            <h3 class="text-sm font-semibold text-slate-100 mb-1">
+              Resumo de hoje
+            </h3>
+            <p class="text-[11px] text-slate-400 mb-2" id="dia-subtitle"></p>
 
-          <p class="mt-3 text-[11px] text-slate-400">
-            Esse histórico é apenas local (no navegador) e some se você recarregar a página.
-          </p>
-        </div>
+            <div class="grid grid-cols-2 gap-3 text-[11px] md:text-xs">
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Análises de hoje</p>
+                <p
+                  id="dia-analises"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Entradas executadas hoje</p>
+                <p
+                  id="dia-executadas"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Confiança média hoje</p>
+                <p
+                  id="dia-avg-conf"
+                  class="text-lg font-semibold text-slate-50"
+                >
+                  0%
+                </p>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-2xl border border-slate-800 p-3">
+                <p class="text-slate-400 mb-1">Distribuição</p>
+                <p
+                  id="dia-dist-text"
+                  class="text-[11px] text-slate-200 leading-relaxed"
+                >
+                  C: 0 • V: 0 • N: 0
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
-    </div>
-  </main>
+    </main>
 
-  <script>
-    // ----------------- ELEMENTOS -----------------
-    const fileInput = document.getElementById("file-input");
-    const previewImage = document.getElementById("preview-image");
-    const previewPlaceholder = document.getElementById("preview-placeholder");
-    const analisarBtn = document.getElementById("analisar-btn");
-    const statusText = document.getElementById("status-text");
-    const resultadoCard = document.getElementById("resultado-card");
-    const acaoText = document.getElementById("acao-text");
-    const confText = document.getElementById("conf-text");
-    const justificativaText = document.getElementById("justificativa-text");
-    const filtroText = document.getElementById("filtro-text");
+    <!-- SCRIPT -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ------------ CONSTANTES ------------
+        const BACKEND_URL =
+          "https://ia-analise-grafico.onrender.com/api/analisar";
 
-    const histBody = document.getElementById("hist-body");
-    const histCount = document.getElementById("hist-count");
+        const MIN_CONF = {
+          conservador: 75,
+          moderado: 60,
+          agressivo: 50,
+        };
 
-    const riskButtons = document.querySelectorAll(".risk-btn");
+        const HISTORY_KEY = "ia_m1_history_v1";
+        const PLAN_KEY = "ia_m1_plan_v1";
 
-    // ----------------- ESTADO -----------------
-    let selectedFile = null;
-    let currentRisk = "conservador";
+        // ------------ ELEMENTOS ------------
+        const fileInput = document.getElementById("file-input");
+        const selectImageBtn = document.getElementById("select-image-btn");
+        const previewImage = document.getElementById("preview-image");
+        const previewPlaceholder = document.getElementById(
+          "preview-placeholder"
+        );
+        const analisarBtn = document.getElementById("analisar-btn");
+        const statusText = document.getElementById("status-text");
+        const timeframeLabel = document.getElementById("timeframe-label");
+        const apiStatus = document.getElementById("api-status");
 
-    const RISK_PROFILES = {
-      conservador: 0.75,
-      moderado: 0.6,
-      agressivo: 0.5,
-    };
+        const stakeText = document.getElementById("stake-text");
+        const resumoStakeText = document.getElementById("resumo-stake-text");
 
-    const BACKEND_URL = "https://ia-analise-grafico.onrender.com/api/analisar";
+        const resultadoCard = document.getElementById("resultado-card");
+        const acaoText = document.getElementById("acao-text");
+        const confText = document.getElementById("conf-text");
+        const justificativaText =
+          document.getElementById("justificativa-text");
+        const filtroText = document.getElementById("filtro-text");
 
-    // ----------------- HELPER: SETAR IMAGEM -----------------
-    function setImageFile(file) {
-      if (!file) return;
+        const histBody = document.getElementById("hist-body");
+        const histCount = document.getElementById("hist-count");
 
-      selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        previewImage.src = ev.target.result;
-        previewImage.classList.remove("hidden");
-        previewPlaceholder.classList.add("hidden");
-      };
-      reader.readAsDataURL(file);
-      statusText.textContent = "Imagem carregada. Pronto para analisar.";
-    }
+        const sessTotalAnalises = document.getElementById(
+          "sess-total-analises"
+        );
+        const sessAvgConf = document.getElementById("sess-avg-conf");
+        const sessExecutadas = document.getElementById("sess-executadas");
+        const sessMetaText = document.getElementById("sess-meta-text");
+        const sessDistText = document.getElementById("sess-dist-text");
 
-    // Abrir seletor ao clicar no label
-    document.querySelector("label").addEventListener("click", () => {
-      fileInput.click();
-    });
+        const diaSubtitle = document.getElementById("dia-subtitle");
+        const diaAnalises = document.getElementById("dia-analises");
+        const diaExecutadas = document.getElementById("dia-executadas");
+        const diaAvgConf = document.getElementById("dia-avg-conf");
+        const diaDistText = document.getElementById("dia-dist-text");
 
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      setImageFile(file);
-    });
+        const bancaInput = document.getElementById("banca-input");
+        const riscoButtons = document.querySelectorAll(".risk-btn");
+        const timeframeButtons =
+          document.querySelectorAll(".timeframe-btn");
+        const riskValueButtons =
+          document.querySelectorAll(".risk-value-btn");
 
-    // Permitir colar print diretamente (Ctrl+V / compartilhar)
-    document.addEventListener("paste", (e) => {
-      const clipboard = e.clipboardData || window.clipboardData;
-      if (!clipboard) return;
+        const metaEntradasInput = document.getElementById(
+          "meta-entradas-input"
+        );
+        const salvarPlanoBtn = document.getElementById("salvar-plano-btn");
+        const planoResumoText =
+          document.getElementById("plano-resumo-text");
 
-      let file = null;
+        // ------------ ESTADO ------------
+        let selectedFile = null;
+        let currentRisk = "conservador";
+        let currentTimeframe = "M1";
 
-      if (clipboard.items && clipboard.items.length) {
-        for (let i = 0; i < clipboard.items.length; i++) {
-          const item = clipboard.items[i];
-          if (item.type.indexOf("image") !== -1) {
-            file = item.getAsFile();
-            break;
+        let bancaAtual = 0;
+        let riskPercent = 1; // 1%
+
+        let history = [];
+        let sessionPlan = { metaEntradas: null };
+
+        // ------------ HELPERS ------------
+        function formatCurrency(value) {
+          if (!value && value !== 0) return "—";
+          return (
+            "R$ " +
+            Number(value)
+              .toFixed(2)
+              .replace(".", ",")
+          );
+        }
+
+        function loadHistory() {
+          try {
+            const raw = localStorage.getItem(HISTORY_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) history = parsed;
+            }
+          } catch (e) {
+            console.warn("Erro ao carregar histórico:", e);
           }
         }
-      }
 
-      if (!file && clipboard.files && clipboard.files.length) {
-        file = clipboard.files[0];
-      }
+        function saveHistory() {
+          try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+          } catch (e) {
+            console.warn("Erro ao salvar histórico:", e);
+          }
+        }
 
-      if (file) {
-        setImageFile(file);
-        statusText.textContent =
-          "Imagem colada da área de transferência. Pronto para analisar.";
-        e.preventDefault();
-      }
-    });
+        function loadPlan() {
+          try {
+            const raw = localStorage.getItem(PLAN_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed && typeof parsed === "object") {
+                sessionPlan = {
+                  metaEntradas: parsed.metaEntradas || null,
+                };
+              }
+            }
+          } catch (e) {
+            console.warn("Erro ao carregar plano:", e);
+          }
+        }
 
-    // ----------------- SELETOR DE RISCO -----------------
-    riskButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const risk = btn.getAttribute("data-risk");
-        currentRisk = risk;
+        function savePlan() {
+          try {
+            localStorage.setItem(PLAN_KEY, JSON.stringify(sessionPlan));
+          } catch (e) {
+            console.warn("Erro ao salvar plano:", e);
+          }
+        }
 
-        riskButtons.forEach((b) => {
-          b.classList.remove(
-            "border-emerald-500/60",
-            "bg-emerald-500/10",
-            "text-emerald-200"
-          );
-          b.classList.add("border-slate-600", "bg-slate-900", "text-slate-200");
+        function updateStakePreview() {
+          if (bancaAtual > 0 && riskPercent > 0) {
+            const stake = (bancaAtual * riskPercent) / 100;
+            stakeText.textContent =
+              "Stake sugerida: " + formatCurrency(stake);
+          } else {
+            stakeText.textContent = "Stake sugerida: —";
+          }
+        }
+
+        function setImageFile(file) {
+          if (!file) return;
+          selectedFile = file;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            previewImage.src = ev.target.result;
+            previewImage.classList.remove("hidden");
+            previewPlaceholder.classList.add("hidden");
+          };
+          reader.readAsDataURL(file);
+          statusText.textContent =
+            "Imagem carregada. Pronto para analisar.";
+        }
+
+        function addToHistory(entry) {
+          history.unshift(entry);
+          if (history.length > 100) history.pop();
+          saveHistory();
+          renderHistory();
+          updateDashboards();
+        }
+
+        function computeStats(list) {
+          const stats = {
+            total: list.length,
+            comprar: 0,
+            vender: 0,
+            naoOperar: 0,
+            avgConf: 0,
+            executadas: 0,
+          };
+
+          if (!list.length) return stats;
+
+          let confSum = 0;
+          let confCount = 0;
+
+          for (const item of list) {
+            const ac = (item.acao || "").toUpperCase();
+            if (ac === "COMPRAR") stats.comprar++;
+            else if (ac === "VENDER") stats.vender++;
+            else stats.naoOperar++;
+
+            if (typeof item.confianca === "number") {
+              confSum += item.confianca;
+              confCount++;
+            }
+
+            if (item.executada) stats.executadas++;
+          }
+
+          stats.avgConf = confCount ? confSum / confCount : 0;
+          return stats;
+        }
+
+        function renderHistory() {
+          histBody.innerHTML = "";
+          if (!history.length) {
+            histCount.textContent = "Nenhuma análise ainda";
+            return;
+          }
+
+          histCount.textContent =
+            history.length +
+            (history.length === 1
+              ? " análise nesta sessão"
+              : " análises nesta sessão");
+
+          history.forEach((item, index) => {
+            const tr = document.createElement("tr");
+            tr.className =
+              "hover:bg-slate-900/70 transition-colors";
+
+            const horaTd = document.createElement("td");
+            horaTd.className = "px-3 py-2 whitespace-nowrap";
+            horaTd.textContent = item.hora || "--:--:--";
+
+            const acaoTd = document.createElement("td");
+            acaoTd.className =
+              "px-3 py-2 font-semibold uppercase";
+            acaoTd.textContent = item.acao || "—";
+
+            const confTd = document.createElement("td");
+            confTd.className = "px-3 py-2";
+            confTd.textContent =
+              typeof item.confianca === "number"
+                ? item.confianca + "%"
+                : "—";
+
+            const perfilTd = document.createElement("td");
+            perfilTd.className = "px-3 py-2";
+            perfilTd.textContent = item.perfilLabel || "—";
+
+            const tfTd = document.createElement("td");
+            tfTd.className = "px-3 py-2";
+            tfTd.textContent = item.timeframe || "—";
+
+            const stakeTd = document.createElement("td");
+            stakeTd.className = "px-3 py-2";
+            stakeTd.textContent = item.stake
+              ? formatCurrency(item.stake)
+              : "—";
+
+            const execTd = document.createElement("td");
+            execTd.className = "px-3 py-2";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "px-2 py-1 rounded-full text-[10px] font-medium border transition";
+            if (item.executada) {
+              btn.textContent = "Executada";
+              btn.classList.add(
+                "bg-emerald-500/15",
+                "border-emerald-500/60",
+                "text-emerald-200"
+              );
+            } else {
+              btn.textContent = "Marcar";
+              btn.classList.add(
+                "bg-slate-900",
+                "border-slate-700",
+                "text-slate-200"
+              );
+            }
+            btn.addEventListener("click", () => {
+              history[index].executada = !history[index].executada;
+              saveHistory();
+              renderHistory();
+              updateDashboards();
+            });
+            execTd.appendChild(btn);
+
+            tr.appendChild(horaTd);
+            tr.appendChild(acaoTd);
+            tr.appendChild(confTd);
+            tr.appendChild(perfilTd);
+            tr.appendChild(tfTd);
+            tr.appendChild(stakeTd);
+            tr.appendChild(execTd);
+
+            histBody.appendChild(tr);
+          });
+        }
+
+        function updateDashboards() {
+          // Sessão completa
+          const sessStats = computeStats(history);
+          sessTotalAnalises.textContent = sessStats.total;
+          sessAvgConf.textContent =
+            sessStats.avgConf.toFixed(1) + "%";
+          sessExecutadas.textContent = sessStats.executadas;
+
+          if (sessionPlan.metaEntradas) {
+            const rest =
+              sessionPlan.metaEntradas - sessStats.executadas;
+            sessMetaText.textContent =
+              "Meta: " +
+              sessionPlan.metaEntradas +
+              " • Restam: " +
+              (rest > 0 ? rest : 0);
+            planoResumoText.textContent =
+              "Plano ativo: " +
+              sessionPlan.metaEntradas +
+              " entradas. Já executadas: " +
+              sessStats.executadas +
+              ".";
+          } else {
+            sessMetaText.textContent = "Meta: —";
+            planoResumoText.textContent =
+              "Nenhum plano definido ainda.";
+          }
+
+          sessDistText.textContent =
+            "C: " +
+            sessStats.comprar +
+            " • V: " +
+            sessStats.vender +
+            " • N: " +
+            sessStats.naoOperar;
+
+          // Resumo diário (hoje)
+          const todayStr = new Date().toLocaleDateString("pt-BR");
+          const todayList = history.filter((item) => {
+            if (!item.timestamp) return false;
+            try {
+              return (
+                new Date(item.timestamp).toLocaleDateString(
+                  "pt-BR"
+                ) === todayStr
+              );
+            } catch {
+              return false;
+            }
+          });
+
+          diaSubtitle.textContent = "Hoje: " + todayStr;
+
+          const diaStats = computeStats(todayList);
+          diaAnalises.textContent = diaStats.total;
+          diaExecutadas.textContent = diaStats.executadas;
+          diaAvgConf.textContent =
+            diaStats.avgConf.toFixed(1) + "%";
+          diaDistText.textContent =
+            "C: " +
+            diaStats.comprar +
+            " • V: " +
+            diaStats.vender +
+            " • N: " +
+            diaStats.naoOperar;
+        }
+
+        async function checkApiStatus() {
+          try {
+            const baseUrl = BACKEND_URL.replace(
+              "/api/analisar",
+              "/"
+            );
+            const res = await fetch(baseUrl);
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            apiStatus.classList.remove(
+              "border-rose-500/70",
+              "bg-rose-500/10",
+              "text-rose-200"
+            );
+            apiStatus.classList.add(
+              "border-emerald-500/60",
+              "bg-emerald-500/10",
+              "text-emerald-200"
+            );
+            apiStatus.innerHTML =
+              '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API Online';
+          } catch (e) {
+            apiStatus.classList.remove(
+              "border-emerald-500/60",
+              "bg-emerald-500/10",
+              "text-emerald-200"
+            );
+            apiStatus.classList.add(
+              "border-rose-500/70",
+              "bg-rose-500/10",
+              "text-rose-200"
+            );
+            apiStatus.innerHTML =
+              '<span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> API Offline';
+          }
+        }
+
+        // ------------ EVENTOS DE UI ------------
+        selectImageBtn.addEventListener("click", () => {
+          fileInput.click();
         });
 
-        btn.classList.remove("border-slate-600", "bg-slate-900", "text-slate-200");
-        btn.classList.add(
-          "border-emerald-500/60",
-          "bg-emerald-500/10",
-          "text-emerald-200"
-        );
-      });
-    });
-
-    // ----------------- HISTÓRICO -----------------
-    const history = [];
-
-    function addToHistory(acao, conf, perfil) {
-      const agora = new Date();
-      const hora = agora.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-
-      history.unshift({ hora, acao, conf, perfil });
-      if (history.length > 10) history.pop();
-
-      renderHistory();
-    }
-
-    function renderHistory() {
-      histBody.innerHTML = "";
-      if (history.length === 0) {
-        histCount.textContent = "Nenhuma análise ainda";
-        return;
-      }
-
-      histCount.textContent = `${history.length} análise(s) nessa sessão`;
-
-      history.forEach((item) => {
-        const tr = document.createElement("tr");
-
-        const tdHora = document.createElement("td");
-        tdHora.className = "px-3 py-2 whitespace-nowrap";
-        tdHora.textContent = item.hora;
-
-        const tdAcao = document.createElement("td");
-        tdAcao.className = "px-3 py-2";
-        tdAcao.textContent = item.acao;
-
-        const tdConf = document.createElement("td");
-        tdConf.className = "px-3 py-2";
-        tdConf.textContent = (item.conf * 100).toFixed(0) + "%";
-
-        const tdPerfil = document.createElement("td");
-        tdPerfil.className = "px-3 py-2 capitalize";
-        tdPerfil.textContent = item.perfil;
-
-        tr.appendChild(tdHora);
-        tr.appendChild(tdAcao);
-        tr.appendChild(tdConf);
-        tr.appendChild(tdPerfil);
-
-        histBody.appendChild(tr);
-      });
-    }
-
-    // ----------------- BOTÃO ANALISAR -----------------
-    analisarBtn.addEventListener("click", async () => {
-      if (!selectedFile) {
-        alert("Selecione ou cole primeiro o print do gráfico.");
-        return;
-      }
-
-      analisarBtn.disabled = true;
-      statusText.textContent = "Analisando gráfico com IA...";
-      resultadoCard.classList.add("hidden");
-      filtroText.textContent = "";
-
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-
-      try {
-        const res = await fetch(BACKEND_URL, {
-          method: "POST",
-          body: formData,
+        fileInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          setImageFile(file);
         });
 
-        if (!res.ok) {
-          const txt = await res.text();
-          console.error("Erro HTTP do backend:", res.status, txt);
-          alert("Erro no servidor de IA: HTTP " + res.status);
-          statusText.textContent = "Erro ao analisar. Tente novamente.";
-          return;
+        // Colar imagem (print copiado)
+        window.addEventListener("paste", (event) => {
+          const items = event.clipboardData?.items;
+          if (!items) return;
+          for (const item of items) {
+            if (item.type.startsWith("image/")) {
+              const file = item.getAsFile();
+              setImageFile(file);
+              break;
+            }
+          }
+        });
+
+        // Risco (perfil)
+        riscoButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const value = btn.dataset.risk;
+            currentRisk = value;
+            riscoButtons.forEach((b) =>
+              b.classList.remove(
+                "border-emerald-500/60",
+                "bg-emerald-500/10",
+                "text-emerald-200"
+              )
+            );
+            if (value === "conservador") {
+              btn.classList.add(
+                "border-emerald-500/60",
+                "bg-emerald-500/10",
+                "text-emerald-200"
+              );
+            } else {
+              btn.classList.add(
+                "border-violet-500/70",
+                "bg-violet-500/10",
+                "text-violet-100"
+              );
+            }
+          });
+        });
+
+        // Timeframe
+        timeframeButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            currentTimeframe = btn.dataset.timeframe || "M1";
+            timeframeLabel.textContent = "(" + currentTimeframe + ")";
+            timeframeButtons.forEach((b) =>
+              b.classList.remove(
+                "border-violet-500/70",
+                "bg-violet-500/15",
+                "text-violet-100"
+              )
+            );
+            btn.classList.add(
+              "border-violet-500/70",
+              "bg-violet-500/15",
+              "text-violet-100"
+            );
+          });
+        });
+
+        // Banca
+        bancaInput.addEventListener("input", () => {
+          const val = parseFloat(bancaInput.value.replace(",", "."));
+          bancaAtual = isNaN(val) ? 0 : val;
+          updateStakePreview();
+        });
+
+        // Risco por operação (0.5 / 1 / 2 %)
+        riskValueButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            riskValueButtons.forEach((b) =>
+              b.classList.remove(
+                "border-violet-500/70",
+                "bg-violet-500/10",
+                "text-violet-100"
+              )
+            );
+            btn.classList.add(
+              "border-violet-500/70",
+              "bg-violet-500/10",
+              "text-violet-100"
+            );
+            const val = parseFloat(btn.dataset.riskValue);
+            riskPercent = isNaN(val) ? 0 : val;
+            updateStakePreview();
+          });
+        });
+
+        // Plano da sessão
+        salvarPlanoBtn.addEventListener("click", () => {
+          const val = parseInt(metaEntradasInput.value, 10);
+          if (!val || val <= 0) {
+            sessionPlan.metaEntradas = null;
+          } else {
+            sessionPlan.metaEntradas = val;
+          }
+          savePlan();
+          updateDashboards();
+        });
+
+        // Analisar
+        analisarBtn.addEventListener("click", async () => {
+          if (!selectedFile) {
+            alert("Selecione uma imagem de gráfico primeiro.");
+            return;
+          }
+
+          analisarBtn.disabled = true;
+          analisarBtn.classList.add("opacity-60", "cursor-not-allowed");
+          statusText.textContent = "Enviando imagem para a IA...";
+          resultadoCard.classList.add("hidden");
+
+          try {
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            // Envia o perfil como texto mais completo (a API só vê uma string)
+            const perfilDescricao =
+              currentRisk.toUpperCase() +
+              " - gráfico " +
+              currentTimeframe +
+              (bancaAtual
+                ? " - banca ~R$" + bancaAtual.toFixed(2)
+                : "") +
+              (riskPercent
+                ? " - risco " + riskPercent + "% por operação"
+                : "");
+            formData.append("risk_profile", perfilDescricao);
+            formData.append("timeframe", currentTimeframe);
+            formData.append("banca", String(bancaAtual || ""));
+            formData.append(
+              "risco_percentual",
+              String(riskPercent || "")
+            );
+
+            const res = await fetch(BACKEND_URL, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!res.ok) {
+              throw new Error("HTTP " + res.status);
+            }
+
+            const data = await res.json();
+
+            let acao = (data.acao || "NAO_OPERAR").toUpperCase();
+            let rawConf = data.confianca ?? 0;
+            let conf =
+              rawConf <= 1 ? Math.round(rawConf * 100) : Math.round(rawConf);
+            if (conf < 0) conf = 0;
+            if (conf > 100) conf = 100;
+
+            const justificativa =
+              data.justificativa ||
+              "A IA não retornou justificativa detalhada.";
+
+            // Aplica filtro de perfil (força NAO_OPERAR se confiança < mínima)
+            const minConf = MIN_CONF[currentRisk] ?? 75;
+            let acaoFinal = acao;
+            let filtroMensagem = "";
+
+            if (conf < minConf && acao !== "NAO_OPERAR") {
+              acaoFinal = "NAO_OPERAR";
+              filtroMensagem =
+                "Perfil " +
+                currentRisk.toUpperCase() +
+                " ativo: confiança " +
+                conf +
+                "% abaixo do mínimo (" +
+                minConf +
+                "%). Ação forçada para NÃO OPERAR.";
+            } else {
+              filtroMensagem =
+                "Ação liberada com base no perfil " +
+                currentRisk.toUpperCase() +
+                " e confiança de " +
+                conf +
+                "%.";
+            }
+
+            // Calcula stake da operação
+            let stake = null;
+            if (bancaAtual > 0 && riskPercent > 0) {
+              stake = (bancaAtual * riskPercent) / 100;
+            }
+
+            // Atualiza UI de resultado
+            confText.textContent = "Confiança: " + conf + "%";
+            acaoText.textContent = acaoFinal.replace("_", " ");
+            justificativaText.textContent = justificativa;
+            filtroText.textContent = filtroMensagem;
+            resumoStakeText.textContent =
+              "Stake para esta análise: " +
+              (stake ? formatCurrency(stake) : "—");
+            resultadoCard.classList.remove("hidden");
+
+            statusText.textContent = "Análise concluída.";
+
+            // Monta item de histórico
+            const now = new Date();
+            const entry = {
+              timestamp: now.toISOString(),
+              hora: now.toLocaleTimeString("pt-BR", {
+                hour12: false,
+              }),
+              acao: acaoFinal,
+              confianca: conf,
+              perfil: currentRisk,
+              perfilLabel:
+                currentRisk === "conservador"
+                  ? "Conservador"
+                  : currentRisk === "moderado"
+                  ? "Moderado"
+                  : "Agressivo",
+              timeframe: currentTimeframe,
+              stake: stake,
+              executada: false,
+            };
+
+            addToHistory(entry);
+          } catch (err) {
+            console.error("Erro no fetch:", err);
+            statusText.textContent =
+              "Erro ao analisar. Tente novamente.";
+            alert("Erro ao conectar com o servidor de IA.");
+          } finally {
+            analisarBtn.disabled = false;
+            analisarBtn.classList.remove(
+              "opacity-60",
+              "cursor-not-allowed"
+            );
+          }
+        });
+
+        // ------------ INICIALIZAÇÃO ------------
+        loadHistory();
+        loadPlan();
+        if (sessionPlan.metaEntradas) {
+          metaEntradasInput.value = sessionPlan.metaEntradas;
         }
-
-        const data = await res.json();
-        console.log("Resposta da IA:", data);
-
-        let acao = (data.acao || "NAO_OPERAR").toUpperCase();
-        const conf = data.confianca ?? 0.0;
-        const justificativa =
-          data.justificativa ||
-          "Mercado indefinido. IA recomenda não operar neste momento.";
-
-        const minConf = RISK_PROFILES[currentRisk] ?? 0.6;
-        let acaoFinal = acao;
-        let aplicouFiltro = false;
-
-        if (conf < minConf && acao !== "NAO_OPERAR") {
-          acaoFinal = "NAO_OPERAR";
-          aplicouFiltro = true;
-        }
-
-        // Estiliza texto da ação
-        if (acaoFinal === "COMPRAR") {
-          acaoText.textContent = "COMPRAR";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-emerald-300";
-        } else if (acaoFinal === "VENDER") {
-          acaoText.textContent = "VENDER";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-rose-200";
-        } else {
-          acaoText.textContent = "NÃO OPERAR";
-          acaoText.className =
-            "text-3xl md:text-4xl font-black mb-2 text-amber-300";
-        }
-
-        confText.textContent = "Confiança: " + (conf * 100).toFixed(0) + "%";
-        justificativaText.textContent = justificativa;
-
-        if (aplicouFiltro) {
-          filtroText.textContent =
-            "Aplicado filtro do perfil " +
-            currentRisk +
-            ": como a confiança veio abaixo de " +
-            (minConf * 100).toFixed(0) +
-            "%, o sistema forçou NÃO OPERAR.";
-        } else {
-          filtroText.textContent =
-            "Decisão alinhada com o perfil " +
-            currentRisk +
-            ". Nenhum filtro adicional foi aplicado.";
-        }
-
-        resultadoCard.classList.remove("hidden");
-        statusText.textContent = "Análise concluída.";
-
-        addToHistory(acaoFinal, conf, currentRisk);
-      } catch (err) {
-        console.error("Erro no fetch:", err);
-        statusText.textContent = "Erro ao analisar. Tente novamente.";
-        alert("Erro ao conectar com o servidor de IA.");
-      } finally {
-        analisarBtn.disabled = false;
-      }
-    });
-  </script>
-</body>
+        updateStakePreview();
+        renderHistory();
+        updateDashboards();
+        checkApiStatus();
+      });
+    </script>
+  </body>
 </html>
