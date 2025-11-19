@@ -121,7 +121,7 @@
                 type="button"
                 class="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-5 py-2.5 text-xs md:text-sm font-semibold text-white shadow-lg shadow-violet-500/40 hover:bg-violet-400 transition"
               >
-                <span>Analyzar gráfico</span>
+                <span>Analizar gráfico</span>
               </button>
 
               <span
@@ -1025,7 +1025,14 @@
 
           try {
             const formData = new FormData();
-            formData.append("file", selectedFile);
+formData.append("image", selectedFile); // ✅ nome certo
+
+// se você estiver adicionando mais coisas, pode manter:
+formData.append("risk_profile", perfilDescricao);
+formData.append("timeframe", currentTimeframe);
+formData.append("banca", String(bancaAtual || ""));
+formData.append("risco_percentual", String(riskPercent || ""));
+
 
             // Envia o perfil como texto mais completo (a API só vê uma string)
             const perfilDescricao =
